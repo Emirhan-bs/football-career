@@ -417,6 +417,7 @@ export function getTeamLogo(teamName: string): string {
     'Brighton': 'https://upload.wikimedia.org/wikipedia/sco/f/fd/Brighton_%26_Hove_Albion_logo.svg',
     'West Ham United': 'https://logos-world.net/wp-content/uploads/2020/06/West-Ham-Logo.png',
 
+
     // La Liga
     'Real Madrid': 'https://logos-world.net/wp-content/uploads/2020/06/Real-Madrid-Logo.png',
     'Barcelona': 'https://logos-world.net/wp-content/uploads/2020/06/Barcelona-Logo.png',
