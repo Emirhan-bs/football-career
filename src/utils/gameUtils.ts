@@ -1,9 +1,8 @@
 import { Player, SeasonRecord, TriviaQuestion } from '../types/Player';
 import { TransferOffer } from '../types/Player';
 
-// Sample clubs by continent
-export const CLUBS_BY_CONTINENT = {
-
+// Sample clubs by league (renamed from CLUBS_BY_CONTINENT)
+export const CLUBS_BY_LEAGUE = {
   'Premier League': [
     { name: 'Manchester City', country: 'England', logo: 'https://logos-world.net/wp-content/uploads/2020/06/Manchester-City-Logo.png' },
     { name: 'Arsenal', country: 'England', logo: 'https://logos-world.net/wp-content/uploads/2020/06/Arsenal-Logo.png' },
@@ -83,8 +82,31 @@ export const CLUBS_BY_CONTINENT = {
     { name: 'Al Nassr', country: 'Saudi Arabia', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/4/48/Al-Nassr_FC_logo.svg/1200px-Al-Nassr_FC_logo.svg.png' },
     { name: 'Al Ittihad', country: 'Saudi Arabia', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/2/2d/Al-Ittihad_Club_logo.svg/1200px-Al-Ittihad_Club_logo.svg.png' },
   ]
+};
 
+// Mapping continents to their leagues
+export const CONTINENT_TO_LEAGUES = {
+  'Europe': ['Premier League', 'La Liga', 'Serie A', 'Bundesliga', 'Ligue 1', 'Eredivisie', 'Primeira Liga', 'Süper Lig'],
+  'South America': ['Brasileirão'],
+  'North America': ['MLS'],
+  'Asia': ['Saudi Pro League'],
+  'Africa': [],
+  'Oceania': []
+};
 
+// Mapping countries to continents for transfer offers
+export const COUNTRY_TO_CONTINENT = {
+  'England': 'Europe',
+  'Spain': 'Europe',
+  'Italy': 'Europe',
+  'Germany': 'Europe',
+  'France': 'Europe',
+  'Netherlands': 'Europe',
+  'Portugal': 'Europe',
+  'Turkey': 'Europe',
+  'Brazil': 'South America',
+  'USA': 'North America',
+  'Saudi Arabia': 'Asia'
 };
 
 // Sample trivia questions
@@ -148,8 +170,11 @@ export const TRIVIA_QUESTIONS: TriviaQuestion[] = [
 ];
 
 export function getRandomTeam(continent: string): string {
-  const teams = CLUBS_BY_CONTINENT[continent as keyof typeof CLUBS_BY_CONTINENT] || CLUBS_BY_CONTINENT['Premier League'];
-  return teams[Math.floor(Math.random() * teams.length)];
+  const leagues = CONTINENT_TO_LEAGUES[continent as keyof typeof CONTINENT_TO_LEAGUES] || CONTINENT_TO_LEAGUES['Europe'];
+  const randomLeague = leagues[Math.floor(Math.random() * leagues.length)];
+  const teams = CLUBS_BY_LEAGUE[randomLeague as keyof typeof CLUBS_BY_LEAGUE] || CLUBS_BY_LEAGUE['Premier League'];
+  const randomTeam = teams[Math.floor(Math.random() * teams.length)];
+  return randomTeam.name; // Return only the name string, not the entire object
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -238,21 +263,24 @@ export function simulateTransfer(player: Player): string {
   const ageMultiplier = age <= 25 ? 1.1 : age <= 30 ? 1.0 : 0.9;
   const adjustedRating = currentRating * ageMultiplier;
 
-  const teams = CLUBS_BY_CONTINENT[player.continent as keyof typeof CLUBS_BY_CONTINENT] || CLUBS_BY_CONTINENT.Europe;
+  const leagues = CONTINENT_TO_LEAGUES[player.continent as keyof typeof CONTINENT_TO_LEAGUES] || CONTINENT_TO_LEAGUES['Europe'];
+  const randomLeague = leagues[Math.floor(Math.random() * leagues.length)];
+  const teams = CLUBS_BY_LEAGUE[randomLeague as keyof typeof CLUBS_BY_LEAGUE] || CLUBS_BY_LEAGUE['Premier League'];
 
   // Filter teams based on player rating
   let availableTeams = teams;
   if (adjustedRating >= 85) {
-    availableTeams = teams.slice(0, 8); // Top tier teams
+    availableTeams = teams.slice(0, Math.min(8, teams.length)); // Top tier teams
   } else if (adjustedRating >= 75) {
-    availableTeams = teams.slice(3, 18); // Mid tier teams
+    availableTeams = teams.slice(3, Math.min(18, teams.length)); // Mid tier teams
   } else {
-    availableTeams = teams.slice(8); // Lower tier teams
+    availableTeams = teams.slice(Math.min(8, teams.length)); // Lower tier teams
   }
 
   // Ensure we don't stay at the same team
-  const filteredTeams = availableTeams.filter(team => team !== player.currentTeam);
-  return filteredTeams[Math.floor(Math.random() * filteredTeams.length)] || availableTeams[0];
+  const filteredTeams = availableTeams.filter(team => team.name !== player.currentTeam);
+  const selectedTeam = filteredTeams.length > 0 ? filteredTeams[Math.floor(Math.random() * filteredTeams.length)] : availableTeams[0];
+  return selectedTeam.name; // Return only the name string
 }
 
 export function generateTransferOffers(player: Player, includeCurrentTeam: boolean = true): TransferOffer[] {
@@ -263,43 +291,47 @@ export function generateTransferOffers(player: Player, includeCurrentTeam: boole
   const ageMultiplier = age <= 25 ? 1.1 : age <= 30 ? 1.0 : 0.9;
   const adjustedRating = currentRating * ageMultiplier;
 
-  // Get teams from all continents for global transfers
-  const allTeams = Object.values(CLUBS_BY_CONTINENT).flat();
+  // Get teams from all leagues for global transfers
+  const allTeams = Object.values(CLUBS_BY_LEAGUE).flat();
 
-  // Create different tiers of teams from all continents
-  // Öncelikle lig bazında kulüpleri ekliyoruz
+  // Create different tiers of teams from all leagues
   const topTierTeams = [
-    ...CLUBS_BY_LEAGUE['Premier League'].slice(0, 3),  // Premier League'den üst seviye kulüpler
-    ...CLUBS_BY_LEAGUE['La Liga'].slice(0, 3),         // La Liga'dan üst seviye kulüpler
-    ...CLUBS_BY_LEAGUE['Serie A'].slice(0, 2),         // Serie A'dan üst seviye kulüpler
+    ...CLUBS_BY_LEAGUE['Premier League'].slice(0, 3),  // Premier League top clubs
+    ...CLUBS_BY_LEAGUE['La Liga'].slice(0, 3),         // La Liga top clubs
+    ...CLUBS_BY_LEAGUE['Serie A'].slice(0, 2),         // Serie A top clubs
   ];
 
   const midTierTeams = [
-    ...CLUBS_BY_LEAGUE['Premier League'].slice(3, 6),  // Premier League'den orta seviye kulüpler
-    ...CLUBS_BY_LEAGUE['La Liga'].slice(3, 6),         // La Liga'dan orta seviye kulüpler
-    ...CLUBS_BY_LEAGUE['Serie A'].slice(2, 5),         // Serie A'dan orta seviye kulüpler
-    ...CLUBS_BY_LEAGUE['Bundesliga'].slice(0, 4),      // Bundesliga'dan orta seviye kulüpler
-    ...CLUBS_BY_LEAGUE['Ligue 1'].slice(0, 3),         // Ligue 1'den orta seviye kulüpler
+    ...CLUBS_BY_LEAGUE['Premier League'].slice(3, 6),  // Premier League mid clubs
+    ...CLUBS_BY_LEAGUE['La Liga'].slice(3, 6),         // La Liga mid clubs
+    ...CLUBS_BY_LEAGUE['Serie A'].slice(2, 5),         // Serie A mid clubs
+    ...CLUBS_BY_LEAGUE['Bundesliga'].slice(0, 4),      // Bundesliga mid clubs
+    ...CLUBS_BY_LEAGUE['Ligue 1'].slice(0, 3),         // Ligue 1 mid clubs
   ];
 
   const lowerTierTeams = [
-    ...CLUBS_BY_LEAGUE['Premier League'].slice(6),     // Premier League'den düşük seviye kulüpler
-    ...CLUBS_BY_LEAGUE['La Liga'].slice(6),            // La Liga'dan düşük seviye kulüpler
-    ...CLUBS_BY_LEAGUE['Serie A'].slice(5),            // Serie A'dan düşük seviye kulüpler
-    ...CLUBS_BY_LEAGUE['Bundesliga'].slice(4),         // Bundesliga'dan düşük seviye kulüpler
-    ...CLUBS_BY_LEAGUE['Ligue 1'].slice(3),            // Ligue 1'den düşük seviye kulüpler
-    ...CLUBS_BY_LEAGUE['Eredivisie'],                  // Eredivisie kulüpleri
-    ...CLUBS_BY_LEAGUE['MLS'],                         // MLS kulüpleri
+    ...CLUBS_BY_LEAGUE['Premier League'].slice(6),     // Premier League lower clubs
+    ...CLUBS_BY_LEAGUE['La Liga'].slice(6),            // La Liga lower clubs
+    ...CLUBS_BY_LEAGUE['Serie A'].slice(5),            // Serie A lower clubs
+    ...CLUBS_BY_LEAGUE['Bundesliga'].slice(4),         // Bundesliga lower clubs
+    ...CLUBS_BY_LEAGUE['Ligue 1'].slice(3),            // Ligue 1 lower clubs
+    ...CLUBS_BY_LEAGUE['Eredivisie'],                  // Eredivisie clubs
+    ...CLUBS_BY_LEAGUE['MLS'],                         // MLS clubs
   ];
-
 
   const offers: TransferOffer[] = [];
 
   // Add option to stay at current team
   if (includeCurrentTeam) {
-    const currentTeamContinent = Object.keys(CLUBS_BY_CONTINENT).find(continent =>
-      CLUBS_BY_CONTINENT[continent as keyof typeof CLUBS_BY_CONTINENT].includes(player.currentTeam)
-    ) || player.continent;
+    // Find current team's continent
+    let currentTeamContinent = player.continent;
+    for (const [league, teams] of Object.entries(CLUBS_BY_LEAGUE)) {
+      const teamObj = teams.find(team => team.name === player.currentTeam);
+      if (teamObj) {
+        currentTeamContinent = COUNTRY_TO_CONTINENT[teamObj.country as keyof typeof COUNTRY_TO_CONTINENT] || player.continent;
+        break;
+      }
+    }
 
     offers.push({
       team: player.currentTeam,
@@ -313,7 +345,7 @@ export function generateTransferOffers(player: Player, includeCurrentTeam: boole
   const numOffers = Math.floor(Math.random() * 3) + (includeCurrentTeam ? 2 : 3); // 3-5 total offers
 
   for (let i = 0; i < numOffers; i++) {
-    let selectedTeam: string;
+    let selectedTeamObj: { name: string; country: string; logo: string };
     let tier: 'top' | 'mid' | 'lower';
     let description: string;
     let continent: string;
@@ -323,31 +355,28 @@ export function generateTransferOffers(player: Player, includeCurrentTeam: boole
 
     if (adjustedRating >= 85 && random < 0.6) {
       // High-rated players get more top tier offers
-      selectedTeam = topTierTeams[Math.floor(Math.random() * topTierTeams.length)];
+      selectedTeamObj = topTierTeams[Math.floor(Math.random() * topTierTeams.length)];
       tier = 'top';
       description = 'A prestigious club competing at the highest level';
     } else if (adjustedRating >= 75 && random < 0.7) {
       // Mid-rated players get more mid tier offers
-      selectedTeam = midTierTeams[Math.floor(Math.random() * midTierTeams.length)];
+      selectedTeamObj = midTierTeams[Math.floor(Math.random() * midTierTeams.length)];
       tier = 'mid';
       description = 'A solid club with good development opportunities';
     } else {
       // Lower-rated or older players get more lower tier offers
-      selectedTeam = lowerTierTeams[Math.floor(Math.random() * lowerTierTeams.length)];
+      selectedTeamObj = lowerTierTeams[Math.floor(Math.random() * lowerTierTeams.length)];
       tier = 'lower';
       description = 'A developing club looking to build for the future';
     }
 
-    // Find which continent this team belongs to
-    // eslint-disable-next-line prefer-const
-    continent = Object.keys(CLUBS_BY_CONTINENT).find(cont =>
-      CLUBS_BY_CONTINENT[cont as keyof typeof CLUBS_BY_CONTINENT].includes(selectedTeam)
-    ) || 'Europe';
+    // Get continent from country
+    continent = COUNTRY_TO_CONTINENT[selectedTeamObj.country as keyof typeof COUNTRY_TO_CONTINENT] || 'Europe';
 
     // Ensure we don't get duplicate teams or current team
-    if (!offers.find(offer => offer.team === selectedTeam)) {
+    if (!offers.find(offer => offer.team === selectedTeamObj.name)) {
       offers.push({
-        team: selectedTeam,
+        team: selectedTeamObj.name, // Use only the name string
         continent,
         tier,
         description
@@ -355,16 +384,14 @@ export function generateTransferOffers(player: Player, includeCurrentTeam: boole
     }
   }
 
-  // If we don't have enough unique offers, fill with random teams from all continents
+  // If we don't have enough unique offers, fill with random teams from all leagues
   while (offers.length < (includeCurrentTeam ? 4 : 3)) {
-    const randomTeam = allTeams[Math.floor(Math.random() * allTeams.length)];
-    const teamContinent = Object.keys(CLUBS_BY_CONTINENT).find(cont =>
-      CLUBS_BY_CONTINENT[cont as keyof typeof CLUBS_BY_CONTINENT].includes(randomTeam)
-    ) || 'Europe';
+    const randomTeamObj = allTeams[Math.floor(Math.random() * allTeams.length)];
+    const teamContinent = COUNTRY_TO_CONTINENT[randomTeamObj.country as keyof typeof COUNTRY_TO_CONTINENT] || 'Europe';
 
-    if (!offers.find(offer => offer.team === randomTeam)) {
+    if (!offers.find(offer => offer.team === randomTeamObj.name)) {
       offers.push({
-        team: randomTeam,
+        team: randomTeamObj.name, // Use only the name string
         continent: teamContinent,
         tier: 'mid',
         description: 'An interesting opportunity for your career'
