@@ -217,9 +217,9 @@ export function simulateSeasonStats(player: Player): Player {
   const updatedPlayer = { ...player };
 
   if (player.position === 'GK') {
-    const saveRate = Math.max(60, Math.min(95, Math.round((player.stats.reflexes! + player.stats.diving! + player.stats.positioning!) / 3) + Math.floor(Math.random() * 10 - 5)));
-    const goalsConceded = Math.max(15, Math.min(50, Math.round(45 - (saveRate * 0.4) + Math.floor(Math.random() * 10 - 5))));
-    const cleanSheets = Math.max(5, Math.min(25, Math.round((saveRate * 0.25) + Math.floor(Math.random() * 8 - 4))));
+    const saveRate = Math.round((player.stats.reflexes! + player.stats.diving! + player.stats.speed!) / 3);
+    const goalsConceded = Math.max(0, 38 - Math.floor(saveRate / 3));
+    const cleanSheets = Math.max(0, 20 - goalsConceded);
 
     updatedPlayer.seasonStats = {
       saveRate,
@@ -238,15 +238,11 @@ export function simulateSeasonStats(player: Player): Player {
     };
   } else {
     // Generate goals and assists based on position and overall rating
-    const positionMultiplier = ['ST'].includes(player.position) ? 0.8 :
-      ['LW', 'RW'].includes(player.position) ? 0.6 :
-      ['CM', 'LM', 'RM'].includes(player.position) ? 0.4 : 0.2;
+    const positionMultiplier = ['ST', 'LW', 'RW'].includes(player.position) ? 1.2 :
+      ['CM', 'LM', 'RM'].includes(player.position) ? 0.8 : 0.4;
 
-    const baseGoals = (player.overallRating - 60) / 40; // Scale from 0 to ~1 for ratings 60-99
-    const baseAssists = (player.overallRating - 60) / 50; // Scale from 0 to ~0.8 for ratings 60-99
-    
-    const goals = Math.max(0, Math.floor(baseGoals * positionMultiplier * 25 * (Math.random() * 0.6 + 0.7))); // 0-20 goals range
-    const assists = Math.max(0, Math.floor(baseAssists * 15 * (Math.random() * 0.6 + 0.7))); // 0-12 assists range
+    const goals = Math.floor((player.overallRating / 10) * positionMultiplier * (Math.random() + 0.5));
+    const assists = Math.floor((player.overallRating / 15) * (Math.random() + 0.5));
 
     updatedPlayer.seasonStats = { goals, assists };
 
@@ -561,7 +557,7 @@ export function updatePlayerAfterSeason(player: Player): Player {
   updatedPlayer.careerHistory = [...player.careerHistory, seasonRecord];
 
   // Age progression and transfer
-  updatedPlayer.age += 1;
+  updatedPlayer.age += 3;
   // Note: Team transfer is now handled separately in the transfer selection phase
 
   return updatedPlayer;
