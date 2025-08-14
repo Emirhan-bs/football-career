@@ -67,19 +67,28 @@ export function GameSetup({ onPlayerCreated }: GameSetupProps) {
   };
 
   const getPositionStyle = (pos: string) => {
-    const positions: { [key: string]: string } = {
-      GK: "left-1/2 top-4 -translate-x-1/2",
-      LB: "left-[150px] top-[120px]",
-      CB: "left-1/2 top-[120px] -translate-x-1/2",
-      RB: "right-[150px] top-[120px]",
-      LM: "left-20 top-1/2 -translate-y-1/2",
+    const positions: Record<string, string> = {
+      // GK
+      GK: "left-1/2 top-[7%] -translate-x-1/2 md:top-4",
+
+      // DEFENDERS
+      LB: "left-[12%] top-[20%] -translate-x-1/2 md:left-[150px] md:top-[120px] md:translate-x-0",
+      CB: "left-1/2 top-[24%] -translate-x-1/2 md:top-[120px]",
+      RB: "left-[88%] top-[20%] -translate-x-1/2 md:left-auto md:right-[150px] md:top-[120px] md:translate-x-0",
+
+      // MIDFIELD
+      LM: "left-[12%] top-1/2 -translate-x-1/2 -translate-y-1/2 md:left-20 md:translate-x-0",
       CM: "left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2",
-      RM: "right-20 top-1/2 -translate-y-1/2",
-      LW: "left-20 top-[450px]",
-      ST: "left-1/2 top-[500px] -translate-x-1/2",
-      RW: "right-20 top-[450px]",
+      RM: "left-[88%] top-1/2 -translate-x-1/2 -translate-y-1/2 md:left-auto md:right-20",
+
+      // ATTACK
+      LW: "left-[12%] top-[78%] -translate-x-1/2 md:left-20 md:top-[450px] md:translate-x-0",
+      ST: "left-1/2 top-[86%] -translate-x-1/2 md:top-[500px]",
+      RW: "left-[88%] top-[78%] -translate-x-1/2 md:left-auto md:right-20 md:top-[450px] md:translate-x-0",
     };
-    return positions[pos] || "";
+
+    // Her zaman absolute olsun
+    return `absolute ${positions[pos] || ""}`;
   };
 
   return (

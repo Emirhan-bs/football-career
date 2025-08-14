@@ -407,14 +407,14 @@ export function getTeamLogo(teamName: string): string {
   const logoMap: { [key: string]: string } = {
     // Premier League
     'Manchester City': 'https://logos-world.net/wp-content/uploads/2020/06/Manchester-City-Logo.png',
-    'Arsenal': 'https://logos-world.net/wp-content/uploads/2020/06/Arsenal-Logo.png',
+    'Arsenal': 'https://upload.wikimedia.org/wikipedia/en/5/53/Arsenal_FC.svg',
     'Liverpool': 'https://logos-world.net/wp-content/uploads/2020/06/Liverpool-Logo.png',
-    'Chelsea': 'https://logos-world.net/wp-content/uploads/2020/06/Chelsea-Logo.png',
-    'Manchester United': 'https://logos-world.net/wp-content/uploads/2020/06/Manchester-United-Logo.png',
-    'Tottenham Hotspur': 'https://logos-world.net/wp-content/uploads/2020/06/Tottenham-Logo.png',
-    'Newcastle United': 'https://logos-world.net/wp-content/uploads/2020/06/Newcastle-United-Logo.png',
+    'Chelsea': 'https://upload.wikimedia.org/wikipedia/sco/c/cc/Chelsea_FC.svg',
+    'Manchester United': 'https://upload.wikimedia.org/wikipedia/sco/7/7a/Manchester_United_FC_crest.svg',
+    'Tottenham Hotspur': 'https://upload.wikimedia.org/wikipedia/sco/b/b4/Tottenham_Hotspur.svg',
+    'Newcastle United': 'https://upload.wikimedia.org/wikipedia/sco/5/56/Newcastle_United_Logo.svg',
     'Aston Villa': 'https://logos-world.net/wp-content/uploads/2020/06/Aston-Villa-Logo.png',
-    'Brighton': 'https://logos-world.net/wp-content/uploads/2020/06/Brighton-Hove-Albion-Logo.png',
+    'Brighton': 'https://upload.wikimedia.org/wikipedia/sco/f/fd/Brighton_%26_Hove_Albion_logo.svg',
     'West Ham United': 'https://logos-world.net/wp-content/uploads/2020/06/West-Ham-Logo.png',
 
     // La Liga
@@ -445,7 +445,7 @@ export function getTeamLogo(teamName: string): string {
     'Lazio': 'https://logos-world.net/wp-content/uploads/2020/06/Lazio-Logo.png',
 
     // Ligue 1
-    'Paris Saint-Germain': 'https://logos-world.net/wp-content/uploads/2020/06/Paris-Saint-Germain-Logo.png',
+    'Paris Saint-Germain': 'https://upload.wikimedia.org/wikipedia/sco/thumb/a/a7/Paris_Saint-Germain_F.C..svg/512px-Paris_Saint-Germain_F.C..svg.png ',
     'Olympique Marseille': 'https://logos-world.net/wp-content/uploads/2020/06/Marseille-Logo.png',
     'Olympique Lyonnais': 'https://logos-world.net/wp-content/uploads/2020/06/Lyon-Logo.png',
     'AS Monaco': 'https://logos-world.net/wp-content/uploads/2020/06/Monaco-Logo.png',
