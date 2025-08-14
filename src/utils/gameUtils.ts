@@ -217,9 +217,9 @@ export function simulateSeasonStats(player: Player): Player {
   const updatedPlayer = { ...player };
 
   if (player.position === 'GK') {
-    const saveRate = Math.round((player.stats.reflexes! + player.stats.diving! + player.stats.speed!) / 3);
-    const goalsConceded = Math.max(0, 38 - Math.floor(saveRate / 3));
-    const cleanSheets = Math.max(0, 20 - goalsConceded);
+    const saveRate = Math.max(60, Math.min(95, Math.round((player.stats.reflexes! + player.stats.diving! + player.stats.positioning!) / 3) + Math.floor(Math.random() * 10 - 5)));
+    const goalsConceded = Math.max(15, Math.min(50, Math.round(45 - (saveRate * 0.4) + Math.floor(Math.random() * 10 - 5))));
+    const cleanSheets = Math.max(5, Math.min(25, Math.round((saveRate * 0.25) + Math.floor(Math.random() * 8 - 4))));
 
     updatedPlayer.seasonStats = {
       saveRate,
@@ -238,11 +238,15 @@ export function simulateSeasonStats(player: Player): Player {
     };
   } else {
     // Generate goals and assists based on position and overall rating
-    const positionMultiplier = ['ST', 'LW', 'RW'].includes(player.position) ? 1.2 :
-      ['CM', 'LM', 'RM'].includes(player.position) ? 0.8 : 0.4;
+    const positionMultiplier = ['ST'].includes(player.position) ? 0.8 :
+      ['LW', 'RW'].includes(player.position) ? 0.6 :
+      ['CM', 'LM', 'RM'].includes(player.position) ? 0.4 : 0.2;
 
-    const goals = Math.floor((player.overallRating / 10) * positionMultiplier * (Math.random() + 0.5));
-    const assists = Math.floor((player.overallRating / 15) * (Math.random() + 0.5));
+    const baseGoals = (player.overallRating - 60) / 40; // Scale from 0 to ~1 for ratings 60-99
+    const baseAssists = (player.overallRating - 60) / 50; // Scale from 0 to ~0.8 for ratings 60-99
+    
+    const goals = Math.max(0, Math.floor(baseGoals * positionMultiplier * 25 * (Math.random() * 0.6 + 0.7))); // 0-20 goals range
+    const assists = Math.max(0, Math.floor(baseAssists * 15 * (Math.random() * 0.6 + 0.7))); // 0-12 assists range
 
     updatedPlayer.seasonStats = { goals, assists };
 
@@ -407,28 +411,34 @@ export function getTeamLogo(teamName: string): string {
   const logoMap: { [key: string]: string } = {
     // Premier League
     'Manchester City': 'https://logos-world.net/wp-content/uploads/2020/06/Manchester-City-Logo.png',
+    'Arsenal': 'https://logos-world.net/wp-content/uploads/2020/06/Arsenal-Logo.png',
     'Liverpool': 'https://logos-world.net/wp-content/uploads/2020/06/Liverpool-Logo.png',
     'Chelsea': 'https://logos-world.net/wp-content/uploads/2020/06/Chelsea-Logo.png',
     'Manchester United': 'https://logos-world.net/wp-content/uploads/2020/06/Manchester-United-Logo.png',
-    'Arsenal': 'https://logos-world.net/wp-content/uploads/2020/06/Arsenal-Logo.png',
-    'Tottenham': 'https://logos-world.net/wp-content/uploads/2020/06/Tottenham-Logo.png',
-    'Leicester City': 'https://logos-world.net/wp-content/uploads/2020/06/Leicester-City-Logo.png',
-    'West Ham': 'https://logos-world.net/wp-content/uploads/2020/06/West-Ham-Logo.png',
-    'Newcastle': 'https://logos-world.net/wp-content/uploads/2020/06/Newcastle-United-Logo.png',
-    'Brighton': 'https://logos-world.net/wp-content/uploads/2020/06/Brighton-Hove-Albion-Logo.png',
-    'Crystal Palace': 'https://logos-world.net/wp-content/uploads/2020/06/Crystal-Palace-Logo.png',
+    'Tottenham Hotspur': 'https://logos-world.net/wp-content/uploads/2020/06/Tottenham-Logo.png',
+    'Newcastle United': 'https://logos-world.net/wp-content/uploads/2020/06/Newcastle-United-Logo.png',
     'Aston Villa': 'https://logos-world.net/wp-content/uploads/2020/06/Aston-Villa-Logo.png',
+    'Brighton': 'https://logos-world.net/wp-content/uploads/2020/06/Brighton-Hove-Albion-Logo.png',
+    'West Ham United': 'https://logos-world.net/wp-content/uploads/2020/06/West-Ham-Logo.png',
 
     // La Liga
     'Real Madrid': 'https://logos-world.net/wp-content/uploads/2020/06/Real-Madrid-Logo.png',
     'Barcelona': 'https://logos-world.net/wp-content/uploads/2020/06/Barcelona-Logo.png',
     'Atletico Madrid': 'https://logos-world.net/wp-content/uploads/2020/06/Atletico-Madrid-Logo.png',
     'Sevilla': 'https://logos-world.net/wp-content/uploads/2020/06/Sevilla-Logo.png',
+    'Real Betis': 'https://logos-world.net/wp-content/uploads/2020/06/Real-Betis-Logo.png',
+    'Villarreal': 'https://logos-world.net/wp-content/uploads/2020/06/Villarreal-Logo.png',
+    'Real Sociedad': 'https://logos-world.net/wp-content/uploads/2020/06/Real-Sociedad-Logo.png',
 
     // Bundesliga
     'Bayern Munich': 'https://logos-world.net/wp-content/uploads/2020/06/Bayern-Munich-Logo.png',
     'Borussia Dortmund': 'https://logos-world.net/wp-content/uploads/2020/06/Borussia-Dortmund-Logo.png',
     'RB Leipzig': 'https://logos-world.net/wp-content/uploads/2020/06/RB-Leipzig-Logo.png',
+    'Bayer Leverkusen': 'https://logos-world.net/wp-content/uploads/2020/06/Bayer-Leverkusen-Logo.png',
+    'Eintracht Frankfurt': 'https://logos-world.net/wp-content/uploads/2020/06/Eintracht-Frankfurt-Logo.png',
+    'VfL Wolfsburg': 'https://logos-world.net/wp-content/uploads/2020/06/Wolfsburg-Logo.png',
+    'SC Freiburg': 'https://upload.wikimedia.org/wikipedia/en/thumb/8/81/SC_Freiburg_logo.svg/1200px-SC_Freiburg_logo.svg.png',
+    'Union Berlin': 'https://upload.wikimedia.org/wikipedia/en/thumb/6/67/1._FC_Union_Berlin_logo.svg/1200px-1._FC_Union_Berlin_logo.svg.png',
 
     // Serie A
     'Juventus': 'https://logos-world.net/wp-content/uploads/2020/06/Juventus-Logo.png',
@@ -437,53 +447,46 @@ export function getTeamLogo(teamName: string): string {
     'AS Roma': 'https://logos-world.net/wp-content/uploads/2020/06/AS-Roma-Logo.png',
     'Napoli': 'https://logos-world.net/wp-content/uploads/2020/06/Napoli-Logo.png',
     'Lazio': 'https://logos-world.net/wp-content/uploads/2020/06/Lazio-Logo.png',
-    'Atalanta': 'https://logos-world.net/wp-content/uploads/2020/06/Atalanta-Logo.png',
 
     // Ligue 1
-    'PSG': 'https://logos-world.net/wp-content/uploads/2020/06/Paris-Saint-Germain-Logo.png',
+    'Paris Saint-Germain': 'https://logos-world.net/wp-content/uploads/2020/06/Paris-Saint-Germain-Logo.png',
+    'Olympique Marseille': 'https://logos-world.net/wp-content/uploads/2020/06/Marseille-Logo.png',
+    'Olympique Lyonnais': 'https://logos-world.net/wp-content/uploads/2020/06/Lyon-Logo.png',
+    'AS Monaco': 'https://logos-world.net/wp-content/uploads/2020/06/Monaco-Logo.png',
+    'LOSC Lille': 'https://logos-world.net/wp-content/uploads/2020/06/Lille-Logo.png',
 
     // Eredivisie
     'Ajax': 'https://logos-world.net/wp-content/uploads/2020/06/Ajax-Logo.png',
+    'PSV Eindhoven': 'https://logos-world.net/wp-content/uploads/2020/06/PSV-Logo.png',
+    'Feyenoord': 'https://logos-world.net/wp-content/uploads/2020/06/Feyenoord-Logo.png',
 
     // Primeira Liga
-    'Porto': 'https://logos-world.net/wp-content/uploads/2020/06/FC-Porto-Logo.png',
-    'Benfica': 'https://logos-world.net/wp-content/uploads/2020/06/Benfica-Logo.png',
+    'FC Porto': 'https://logos-world.net/wp-content/uploads/2020/06/Porto-Logo.png',
+    'SL Benfica': 'https://logos-world.net/wp-content/uploads/2020/06/Benfica-Logo.png',
+    'Sporting CP': 'https://logos-world.net/wp-content/uploads/2020/06/Sporting-Logo.png',
 
-    // South American clubs
-    'Boca Juniors': 'https://logos-world.net/wp-content/uploads/2020/06/Boca-Juniors-Logo.png',
-    'River Plate': 'https://logos-world.net/wp-content/uploads/2020/06/River-Plate-Logo.png',
+    // Süper Lig
+    'Galatasaray': 'https://logos-world.net/wp-content/uploads/2020/06/Galatasaray-Logo.png',
+    'Fenerbahçe': 'https://logos-world.net/wp-content/uploads/2020/06/Fenerbahce-Logo.png',
+    'Beşiktaş': 'https://logos-world.net/wp-content/uploads/2020/06/Besiktas-Logo.png',
+    'Trabzonspor': 'https://logos-world.net/wp-content/uploads/2020/06/Trabzonspor-Logo.png',
+    'Başakşehir': 'https://upload.wikimedia.org/wikipedia/tr/thumb/3/3f/İstanbul_Başakşehir_FK_logo.svg/2048px-İstanbul_Başakşehir_FK_logo.svg.png',
+    'Adana Demirspor': 'https://upload.wikimedia.org/wikipedia/tr/thumb/3/30/Adana_Demirspor_logo.svg/1200px-Adana_Demirspor_logo.svg.png',
+
+    // Brasileirão
     'Flamengo': 'https://logos-world.net/wp-content/uploads/2020/06/Flamengo-Logo.png',
     'Palmeiras': 'https://logos-world.net/wp-content/uploads/2020/06/Palmeiras-Logo.png',
-    'Santos': 'https://logos-world.net/wp-content/uploads/2020/06/Santos-Logo.png',
+    'Sao Paulo': 'https://logos-world.net/wp-content/uploads/2020/06/Sao-Paulo-Logo.png',
     'Corinthians': 'https://logos-world.net/wp-content/uploads/2020/06/Corinthians-Logo.png',
 
     // MLS
     'LA Galaxy': 'https://logos-world.net/wp-content/uploads/2020/06/LA-Galaxy-Logo.png',
-    'LAFC': 'https://logos-world.net/wp-content/uploads/2020/06/LAFC-Logo.png',
     'Inter Miami': 'https://logos-world.net/wp-content/uploads/2020/06/Inter-Miami-Logo.png',
-    'Atlanta United': 'https://logos-world.net/wp-content/uploads/2020/06/Atlanta-United-Logo.png',
-    'Seattle Sounders': 'https://logos-world.net/wp-content/uploads/2020/06/Seattle-Sounders-Logo.png',
-    'Portland Timbers': 'https://logos-world.net/wp-content/uploads/2020/06/Portland-Timbers-Logo.png',
-    'New York City FC': 'https://logos-world.net/wp-content/uploads/2020/06/New-York-City-FC-Logo.png',
-    'Toronto FC': 'https://logos-world.net/wp-content/uploads/2020/06/Toronto-FC-Logo.png',
 
-    // Liga MX
-    'Club América': 'https://logos-world.net/wp-content/uploads/2020/06/Club-America-Logo.png',
-    'Cruz Azul': 'https://logos-world.net/wp-content/uploads/2020/06/Cruz-Azul-Logo.png',
-    'Chivas': 'https://logos-world.net/wp-content/uploads/2020/06/Chivas-Logo.png',
-    'Pumas': 'https://logos-world.net/wp-content/uploads/2020/06/Pumas-Logo.png',
-    'Tigres': 'https://logos-world.net/wp-content/uploads/2020/06/Tigres-Logo.png',
-    'Monterrey': 'https://logos-world.net/wp-content/uploads/2020/06/Monterrey-Logo.png',
-
-    // A-League
-    'Sydney FC': 'https://logos-world.net/wp-content/uploads/2020/06/Sydney-FC-Logo.png',
-    'Melbourne Victory': 'https://logos-world.net/wp-content/uploads/2020/06/Melbourne-Victory-Logo.png',
-    'Melbourne City': 'https://logos-world.net/wp-content/uploads/2020/06/Melbourne-City-Logo.png',
-    'Western Sydney Wanderers': 'https://logos-world.net/wp-content/uploads/2020/06/Western-Sydney-Wanderers-Logo.png',
-    'Brisbane Roar': 'https://logos-world.net/wp-content/uploads/2020/06/Brisbane-Roar-Logo.png',
-    'Adelaide United': 'https://logos-world.net/wp-content/uploads/2020/06/Adelaide-United-Logo.png',
-    'Perth Glory': 'https://logos-world.net/wp-content/uploads/2020/06/Perth-Glory-Logo.png',
-    'Wellington Phoenix': 'https://logos-world.net/wp-content/uploads/2020/06/Wellington-Phoenix-Logo.png'
+    // Saudi Pro League
+    'Al Hilal': 'https://upload.wikimedia.org/wikipedia/en/thumb/1/12/Al-Hilal_FC_logo.svg/1200px-Al-Hilal_FC_logo.svg.png',
+    'Al Nassr': 'https://upload.wikimedia.org/wikipedia/en/thumb/4/48/Al-Nassr_FC_logo.svg/1200px-Al-Nassr_FC_logo.svg.png',
+    'Al Ittihad': 'https://upload.wikimedia.org/wikipedia/en/thumb/2/2d/Al-Ittihad_Club_logo.svg/1200px-Al-Ittihad_Club_logo.svg.png'
   };
 
   // Return the logo URL if available, otherwise return a fallback
@@ -558,7 +561,7 @@ export function updatePlayerAfterSeason(player: Player): Player {
   updatedPlayer.careerHistory = [...player.careerHistory, seasonRecord];
 
   // Age progression and transfer
-  updatedPlayer.age += 3;
+  updatedPlayer.age += 1;
   // Note: Team transfer is now handled separately in the transfer selection phase
 
   return updatedPlayer;
